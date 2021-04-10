@@ -3,10 +3,21 @@ import express from 'express';
 import logging from './config/logging';
 import config from './config/config';
 import { Request, Response, NextFunction } from 'express';
-import sampleRoutes from './routes/sample';
+import userRoutes from './routes/user';
+import mongoose from 'mongoose';
 
 const NAMESPACE = 'Server';
 const router = express();
+
+// connect DB
+mongoose
+    .connect(config.mongo.url, config.mongo.options)
+    .then((result) => {
+        logging.info(NAMESPACE, 'Connect to MondoDB!');
+    })
+    .catch((error) => {
+        logging.error(NAMESPACE, error.message, error);
+    });
 
 // logging the request
 router.use((req: Request, res: Response, next: NextFunction): void => {
@@ -45,7 +56,7 @@ router.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 // Routes
-router.use('/sample', sampleRoutes);
+router.use('/users', userRoutes);
 
 // Error Handling
 router.use((req: Request, res: Response, next: NextFunction) => {
